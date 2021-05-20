@@ -61,6 +61,25 @@
                             </div>
                         </div>
 
+                        <div class="form-group row">
+                            <label for="group" class="col-md-4 col-form-label text-md-right">{{ __('Group') }}</label>
+
+                            <div class="col-md-6">
+                                <select id="group" type="group" class="form-control @error('group') is-invalid @enderror" name="group" value="{{ old('group') }}" required autocomplete="group">
+                                    <option value="" disabled @if(old('group')=='') selected @endif>{{ __('Please select') }}</option>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}" @if(old('group')==$group->id) selected @endif>{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+
+                                @error('group')
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $message }}</strong>
+                                    </span>
+                                @enderror
+                            </div>
+                        </div>
+
                         <div class="form-group row mb-0">
                             <div class="col-md-6 offset-md-4">
                                 <button type="submit" class="btn btn-primary">
