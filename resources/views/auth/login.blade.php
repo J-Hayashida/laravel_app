@@ -11,7 +11,7 @@
                     <form method="POST" action="{{ route('login') }}">
                         @csrf
 
-                        <div class="form-group row">
+                        <!--div class="form-group row">
                             <label for="email" class="col-md-4 col-form-label text-md-right">{{ __('E-Mail Address') }}</label>
 
                             <div class="col-md-6">
@@ -22,6 +22,43 @@
                                         <strong>{{ $message }}</strong>
                                     </span>
                                 @enderror
+                            </div>
+                        </div-->
+
+                        <div class="form-group row">
+                            <label for="group" class="col-sm-4 col-form-label text-md-right">{{ __('Group') }}</label>
+
+                            <div class="col-md-6">
+                                <select id="group" type="group" class="form-control{{ $errors->has('group') ? ' is-invalid' : '' }}" name="group" value="{{ old('group') }}" required autofocus>
+                                    <option value="" disabled @if(old('group')=='') selected @endif>{{ __('Please select') }}</option>
+                                    @foreach($groups as $group)
+                                        <option value="{{ $group->id }}" @if(old('group')==$group->id) selected @endif>{{ $group->name }}</option>
+                                    @endforeach
+                                </select>
+
+                                @if ($errors->has('group'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('group') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="form-group row">
+                            <label for="name" class="col-sm-4 col-form-label text-md-right">{{ __('Name') }}</label>
+
+                            <div class="col-md-6">
+                                <select id="name" type="name" class="form-control{{ $errors->has('name') ? ' is-invalid' : '' }}" name="name" value="{{ old('name') }}" required>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->name }}" @if(old('name')==$user->name) selected @endif>{{ $user->name }}</option>
+                                    @endforeach
+                                </select>
+
+                                @if ($errors->has('name'))
+                                    <span class="invalid-feedback" role="alert">
+                                        <strong>{{ $errors->first('name') }}</strong>
+                                    </span>
+                                @endif
                             </div>
                         </div>
 
@@ -70,4 +107,39 @@
         </div>
     </div>
 </div>
+@endsection
+
+@section('script')
+<script>
+    // "$(function(){});"ではなく”window.onload"を使うこと
+    // 理由：js/app.jsをdefer指定で読み込んでいる為、ロード後のスクリプト実行時に"$"が使えない
+    window.onload = function(){
+        // グループセレクトボックス変更時
+        $("#group").change(function () {
+            getGroupUsers($(this).val());
+        });
+    }
+
+    // グループ所属ユーザ取得処理
+    function getGroupUsers(group, name){
+        var params = {
+            'group': group,
+        };
+        axios.post('{{ route('login.get_group_users') }}', params)
+            .then((response) => {
+                $('#name option').remove();
+                $('#name').append($("<option>").text("{{ __('Please select') }}").attr('value','').prop('disabled', true).prop('selected', true));
+                $.each(response.data, function(key,value) {
+                    $('#name').append($("<option>").text(value.name).attr('value',value.name));
+                });
+                if (name != undefined){
+                    $('#name').val(name);
+                }
+            }).catch(() => {
+                console.log('Failed');
+            }).then(() => {
+                console.log('Complete!');
+            });
+    }
+</script>
 @endsection

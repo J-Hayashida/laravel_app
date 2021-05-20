@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Group;
 
 class RegisterController extends Controller
 {
@@ -53,6 +54,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'group' => ['required', 'int'],
         ]);
     }
 
@@ -68,6 +70,16 @@ class RegisterController extends Controller
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
+            'groups_id' => $data['group'],
         ]);
+    }
+
+    /**
+     * Laravelフレームワークが提供する登録画面表示メソッドをオーバーライド
+     */
+    public function showRegistrationForm()
+    {
+        $groups = Group::where('active', 1)->orderBy('seq')->get();
+        return view('auth.register')->with(['groups' => $groups]);
     }
 }

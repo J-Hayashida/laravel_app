@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,5 +19,6 @@ Route::get('/', function () {
 });
 
 Auth::routes();
+Route::post('/login/get_group_users', [App\Http\Controllers\Auth\LoginController::class, 'getGroupUsers'])->name('login.get_group_users');
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
